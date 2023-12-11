@@ -39,12 +39,24 @@ function sendToSlack(messages, config) {
         limitedCountOfMessages = messages;
     }
 
-    // The JSON payload to send to the Webhook
+    // The JSON payload to send to the Webhook. 
+    // jna 2023-12-11 the "username" field is not allowed to modify the username anymore - moving this to a block instead.
+    // see: https://api.slack.com/messaging/webhooks
     let payload = {
-        username: config.username || config.servername || os.hostname(),
         attachments: []
     };
 
+    // add a section header with the username and hostname.
+    payload.blocks = [
+        {
+            "type": "section",
+            "text": {
+                "type": "mrkdwn",
+                "text": `*${os.userInfo().username}* on ${config.servername || os.hostname()}`
+            }
+
+        }
+    ];
 
     // Merge together all messages from same process and with same event
     // Convert messages to Slack message's attachments
